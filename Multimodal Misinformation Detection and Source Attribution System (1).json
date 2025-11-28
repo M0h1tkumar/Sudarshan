@@ -1,0 +1,781 @@
+{
+  "name": "Multimodal Misinformation Detection and Source Attribution System",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "a4566ba5-6e1a-4114-b038-3bc120c2ecd8",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -21648,
+        2640
+      ],
+      "webhookId": "ba331500-5b03-4b13-b8af-b2ef67f0a453"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "twitterBearerToken",
+              "value": "AAAAAAAAAAAAAAAAAAAAAL7B5gEAAAAA3aKc8nwlvuB8EtI54Fg3PlVyc74%3D7lj13PCCgMJC3yxR1qoILgKsIUx9SpIVt9SgkxtNqx8NDMvdbm",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "twitterAccessToken",
+              "value": "1994481506438594560-Aro5Y4OKFCPL20rmck6JmpuZU3wPUp",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "openaiApiKey",
+              "value": "sk-proj-demo-key-replace-with-actual-openai-key",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "geminiApiKey",
+              "value": "AIzaSyDemo-Replace-With-Actual-Gemini-API-Key",
+              "type": "string"
+            },
+            {
+              "id": "id-7",
+              "name": "perplexityApiKey",
+              "value": "pplx-demo-key-replace-with-actual-perplexity-key",
+              "type": "string"
+            },
+            {
+              "id": "id-5",
+              "name": "maxRetries",
+              "value": 3,
+              "type": "number"
+            },
+            {
+              "id": "id-6",
+              "name": "requestTimeout",
+              "value": 30000,
+              "type": "number"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "5e830851-f966-41ea-b4f8-a80221b42958",
+      "name": "Workflow Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -21424,
+        2640
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $('Chat Trigger').item.json.chatInput }}",
+              "rightValue": "data:image",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "id": "93dfeba2-4a79-44b4-a466-38ea02467eab",
+      "name": "Check Input Type",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -21200,
+        2640
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "id": "02ac2896-a391-422d-a1bb-9c3d5a9d623a",
+      "name": "Extract Image Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -20976,
+        2448
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "options": {
+          "systemMessage": "You are a vision AI assistant. Analyze the provided image and extract all text content from it. Return only the extracted text without any additional commentary or formatting."
+        }
+      },
+      "id": "85957646-f924-461f-89de-884d3eb407a5",
+      "name": "Gemini Vision Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -20752,
+        2432
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "5121a2f7-9363-4fbc-8e08-2c30e4108fb1",
+      "name": "Gemini Vision Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -20672,
+        2752
+      ],
+      "credentials": {
+        "googleGeminiApi": {
+          "id": "gemini-api-credential",
+          "name": "Gemini API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "extractedText",
+              "value": "={{ $json.output || $json.chatInput }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "6d220819-7b9d-406f-8612-d6b3df007868",
+      "name": "Merge Input Paths",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -20400,
+        2640
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twitter.com/2/tweets/search/recent",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "={{ 'Bearer ' + $('Workflow Configuration').first().json.twitterBearerToken }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.extractedText }}"
+            },
+            {
+              "name": "max_results",
+              "value": "10"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "f7f5db6a-913f-4300-9ca2-de6c1679efa1",
+      "name": "Search Twitter API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -19568,
+        2640
+      ]
+    },
+    {
+      "parameters": {
+        "messages": {
+          "message": [
+            {
+              "content": "=Fact-check the following claim and provide citations from reliable sources: {{ $json.extractedText }}. Also analyze the X/Twitter data: {{ JSON.stringify($json.body) }}"
+            }
+          ]
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "id": "fff6a7cc-9a4e-4d3a-81d2-b9a92f814884",
+      "name": "Perplexity Fact Check",
+      "type": "n8n-nodes-base.perplexity",
+      "typeVersion": 1,
+      "position": [
+        -19264,
+        2176
+      ],
+      "credentials": {
+        "perplexityApi": {
+          "id": "perplexity-api-credential",
+          "name": "Perplexity API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Claim: {{ $json.extractedText }}\n\nX/Twitter Data: {{ JSON.stringify($json.body) }}",
+        "options": {
+          "systemMessage": "You are a fact-checking AI assistant. Analyze the provided claim and X/Twitter data. Determine if the information is accurate or contains misinformation. Provide:\n1. Verdict (True/False/Partially True/Unverifiable)\n2. Evidence and reasoning\n3. Citations from reliable sources\n4. Confidence level (0-100%)"
+        }
+      },
+      "id": "1bbc90fe-ff51-47c5-80f9-43827c1bb399",
+      "name": "ChatGPT Fact Check",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -19328,
+        2544
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "id",
+          "value": "gpt-4-turbo"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "572c166b-7a50-41fd-9c1e-2a4da5c13cd3",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -19248,
+        2768
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-api-credential",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Claim: {{ $json.extractedText }}\n\nX/Twitter Data: {{ JSON.stringify($json.body) }}",
+        "options": {
+          "systemMessage": "You are a fact-checking AI assistant. Analyze the provided claim and X/Twitter data. Determine if the information is accurate or contains misinformation. Provide:\n1. Verdict (True/False/Partially True/Unverifiable)\n2. Evidence and reasoning\n3. Citations from reliable sources\n4. Confidence level (0-100%)"
+        }
+      },
+      "id": "d718053c-8e00-41ed-a099-a367aa09b179",
+      "name": "Gemini Fact Check",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -19312,
+        2992
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-pro",
+        "options": {}
+      },
+      "id": "ec94cb71-a78a-4dbf-9ac5-d2baa37a7468",
+      "name": "Gemini Fact Check Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -19280,
+        3280
+      ]
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "output",
+        "options": {}
+      },
+      "id": "96781ee3-9598-483c-a891-8ca26fcd2995",
+      "name": "Aggregate Fact Checks",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -18976,
+        2640
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Original Claim: {{ $('Merge Input Paths').first().json.extractedText }}\n\nFact-Check Results:\n{{ JSON.stringify($json.output) }}\n\nX/Twitter Data:\n{{ JSON.stringify($('Scrape X (Twitter)').first().json.body) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an expert misinformation analyst. Your task is to:\n\n1. Analyze the fact-check results from multiple AI models (Perplexity, ChatGPT, Gemini)\n2. Synthesize their findings into a comprehensive summary\n3. Determine the overall verdict on the claim\n4. Identify the original source/user who started the misinformation (if applicable) from the X/Twitter data\n5. Provide proper citations from official and reliable sources\n\nYour response should include:\n- Overall Verdict (True/False/Partially True/Unverifiable)\n- Summary of Evidence\n- Source Attribution (who started the misinformation)\n- Official Citations (with URLs when available)\n- Confidence Level"
+        }
+      },
+      "id": "2cebb732-ea26-4bca-b8d7-74d0c9054cba",
+      "name": "Groq Summarization Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        -18752,
+        2640
+      ]
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-70b-versatile",
+        "options": {}
+      },
+      "id": "efbc7ede-315b-40da-9cf2-b268cba5409c",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -18752,
+        2864
+      ]
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n\t\"type\": \"object\",\n\t\"properties\": {\n\t\t\"verdict\": {\n\t\t\t\"type\": \"string\",\n\t\t\t\"description\": \"Overall verdict on the claim (True/False/Partially True/Unverifiable)\"\n\t\t},\n\t\t\"confidenceLevel\": {\n\t\t\t\"type\": \"number\",\n\t\t\t\"description\": \"Confidence level as a percentage (0-100)\"\n\t\t},\n\t\t\"evidenceSummary\": {\n\t\t\t\"type\": \"string\",\n\t\t\t\"description\": \"Summary of evidence supporting the verdict\"\n\t\t},\n\t\t\"sourceAttribution\": {\n\t\t\t\"type\": \"object\",\n\t\t\t\"properties\": {\n\t\t\t\t\"username\": {\n\t\t\t\t\t\"type\": \"string\",\n\t\t\t\t\t\"description\": \"Username of the original source\"\n\t\t\t\t},\n\t\t\t\t\"profileUrl\": {\n\t\t\t\t\t\"type\": \"string\",\n\t\t\t\t\t\"description\": \"URL to the user's profile\"\n\t\t\t\t},\n\t\t\t\t\"postUrl\": {\n\t\t\t\t\t\"type\": \"string\",\n\t\t\t\t\t\"description\": \"URL to the original post\"\n\t\t\t\t},\n\t\t\t\t\"timestamp\": {\n\t\t\t\t\t\"type\": \"string\",\n\t\t\t\t\t\"description\": \"Timestamp of the original post\"\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"description\": \"Attribution information for the source of misinformation\"\n\t\t},\n\t\t\"citations\": {\n\t\t\t\"type\": \"array\",\n\t\t\t\"items\": {\n\t\t\t\t\"type\": \"object\",\n\t\t\t\t\"properties\": {\n\t\t\t\t\t\"title\": {\n\t\t\t\t\t\t\"type\": \"string\",\n\t\t\t\t\t\t\"description\": \"Title of the citation source\"\n\t\t\t\t\t},\n\t\t\t\t\t\"url\": {\n\t\t\t\t\t\t\"type\": \"string\",\n\t\t\t\t\t\t\"description\": \"URL of the citation source\"\n\t\t\t\t\t},\n\t\t\t\t\t\"source\": {\n\t\t\t\t\t\t\"type\": \"string\",\n\t\t\t\t\t\t\"description\": \"Name of the source organization or publication\"\n\t\t\t\t\t}\n\t\t\t\t}\n\t\t\t},\n\t\t\t\"description\": \"Array of citations from reliable sources\"\n\t\t},\n\t\t\"perplexityAnalysis\": {\n\t\t\t\"type\": \"string\",\n\t\t\t\"description\": \"Analysis from Perplexity AI\"\n\t\t},\n\t\t\"chatgptAnalysis\": {\n\t\t\t\"type\": \"string\",\n\t\t\t\"description\": \"Analysis from ChatGPT\"\n\t\t},\n\t\t\"geminiAnalysis\": {\n\t\t\t\"type\": \"string\",\n\t\t\t\"description\": \"Analysis from Gemini AI\"\n\t\t}\n\t},\n\t\"required\": [\"verdict\", \"confidenceLevel\", \"evidenceSummary\", \"citations\"]\n}"
+      },
+      "id": "b6687786-b102-4a94-9df5-7652dad88b50",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -18608,
+        2864
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "response",
+              "value": "=<div style=\"font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;\">\n  <h2 style=\"color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;\">Misinformation Analysis Report</h2>\n  \n  <div style=\"background-color: #ecf0f1; padding: 15px; border-radius: 5px; margin: 20px 0;\">\n    <h3 style=\"color: #34495e; margin-top: 0;\">Original Claim</h3>\n    <p style=\"font-style: italic;\">{{ $('Merge Input Paths').first().json.extractedText }}</p>\n  </div>\n  \n  <div style=\"background-color: #e8f5e9; padding: 15px; border-radius: 5px; margin: 20px 0;\">\n    <h3 style=\"color: #27ae60; margin-top: 0;\">Analysis Results</h3>\n    <div>{{ $json.output }}</div>\n  </div>\n  \n  <div style=\"background-color: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;\">\n    <h3 style=\"color: #f39c12; margin-top: 0;\">X/Twitter Context</h3>\n    <pre style=\"background-color: white; padding: 10px; border-radius: 3px; overflow-x: auto;\">{{ JSON.stringify($('Scrape X (Twitter)').first().json.body, null, 2) }}</pre>\n  </div>\n  \n  <div style=\"margin-top: 30px; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #3498db;\">\n    <p style=\"margin: 0; font-size: 12px; color: #7f8c8d;\">Generated by Multimodal Misinformation Detection System</p>\n  </div>\n</div>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "684538d0-906d-4a38-b7c0-edb6a27b6542",
+      "name": "Format for Display",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -18400,
+        2640
+      ]
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "mode": "name",
+          "value": "public"
+        },
+        "table": {
+          "__rl": true,
+          "mode": "name",
+          "value": "misinformation_analysis_logs"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "session_id": "={{ $('Chat Trigger').first().json.sessionId }}",
+            "claim": "={{ $('Merge Input Paths').first().json.extractedText }}",
+            "verdict": "={{ $json.output.verdict }}",
+            "confidence_level": "={{ $json.output.confidenceLevel }}",
+            "evidence_summary": "={{ $json.output.evidenceSummary }}",
+            "source_attribution": "={{ JSON.stringify($json.output.sourceAttribution) }}",
+            "citations": "={{ JSON.stringify($json.output.citations) }}",
+            "created_at": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "8199682a-f795-442a-91f0-e581c18023da",
+      "name": "Log Analysis to Database",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -18176,
+        2640
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "85be7295-1f59-4d31-b33a-97cf8a3f6f6a",
+      "name": "Scrape Reddit",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -19968,
+        2640
+      ]
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "id": "74f48e1e-0a69-445b-8eae-bb1a6c3c5e77",
+      "name": "Merge Social Media Data",
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -19760,
+        2640
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a7b11d63-77d8-4fb9-87d0-8ef71fb3be94"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        -20192,
+        2640
+      ],
+      "id": "0d4f7f71-4bf1-4941-aa68-7b84ac308279",
+      "name": "Switch"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "Workflow Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Configuration": {
+      "main": [
+        [
+          {
+            "node": "Check Input Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Input Type": {
+      "main": [
+        [
+          {
+            "node": "Extract Image Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge Input Paths",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Image Text": {
+      "main": [
+        [
+          {
+            "node": "Gemini Vision Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Vision Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Gemini Vision Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Vision Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge Input Paths",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Input Paths": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape X (Twitter)": {
+      "main": [
+        [
+          {
+            "node": "Perplexity Fact Check",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "ChatGPT Fact Check",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Gemini Fact Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "ChatGPT Fact Check",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Fact Check Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Gemini Fact Check",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Perplexity Fact Check": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Fact Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ChatGPT Fact Check": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Fact Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Fact Check": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Fact Checks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Fact Checks": {
+      "main": [
+        [
+          {
+            "node": "Groq Summarization Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Groq Summarization Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Summarization Agent": {
+      "main": [
+        [
+          {
+            "node": "Format for Display",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Groq Summarization Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format for Display": {
+      "main": [
+        [
+          {
+            "node": "Log Analysis to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Scrape Reddit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape Reddit": {
+      "main": [
+        [
+          {
+            "node": "Merge Social Media Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Social Media Data": {
+      "main": [
+        [
+          {
+            "node": "Scrape X (Twitter)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f498ff25-c9e1-4293-b48a-88416204ab2f",
+  "meta": {
+    "instanceId": "809ba559f681045b37b3638c3f5b3d51614aed11cedc80077061b15a4880293b"
+  },
+  "id": "d1cz3CVrPJfG2vvK",
+  "tags": []
+}

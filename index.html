@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudarsahan</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <nav>
+            <h1 id="logo">Sudarsahan</h1>
+            <ul id="nav-menu">
+                <li><a href="#home" onclick="showSection('home')">Home</a></li>
+                <li><a href="#pricing" onclick="showSection('pricing')">Pricing</a></li>
+                <li><a href="#enterprise" onclick="showSection('enterprise')">Enterprise</a></li>
+                <li><a href="#api" onclick="showSection('api')">API</a></li>
+                <li><a href="#about" onclick="showSection('about')">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home" class="section active">
+            <h2>Sudrashan - Misinformation Detection</h2>
+            <p id="dynamic-text">Detect misinformation in text and images</p>
+            <div class="samples-section">
+                <h3>🧪 Try Sample Cases</h3>
+                <div class="sample-buttons">
+                    <button onclick="loadSample('fake-news')" class="sample-btn">Fake News Sample</button>
+                    <button onclick="loadSample('misinformation')" class="sample-btn">Misinformation Sample</button>
+                    <button onclick="loadSample('verified')" class="sample-btn">Verified News Sample</button>
+                    <button onclick="loadSample('rumor')" class="sample-btn">Rumor Sample</button>
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <div class="input-group">
+                    <h3>Text Input</h3>
+                    <textarea id="text-input" placeholder="Enter your text here or try a sample above..."></textarea>
+                    <button onclick="processText()">Process Text</button>
+                </div>
+                <div class="input-group">
+                    <h3>Image Input</h3>
+                    <input type="file" id="image-input" accept="image/*" multiple>
+                    <button onclick="processImages()">Process Images</button>
+                </div>
+            </div>
+            <div id="results" class="results-container"></div>
+            
+            <div class="premium-feature" id="weekly-insights" style="display: none;">
+                <h3>📈 Weekly Misinformation Insights (Premium)</h3>
+                <button onclick="generateWeeklyReport()" class="premium-btn">Generate This Week's Report</button>
+                <div id="weekly-report"></div>
+            </div>
+        </section>
+
+        <section id="about" class="section">
+            <h2>Why Choose Sudrashan?</h2>
+            <div class="value-props">
+                <div class="value-prop">
+                    <h3>🎯 99.2% Accuracy</h3>
+                    <p>Industry-leading precision with 5-layer AI verification system</p>
+                </div>
+                <div class="value-prop">
+                    <h3>⚡ Real-time Processing</h3>
+                    <p>Get results in 2-3 seconds with Groq's lightning-fast LLMs</p>
+                </div>
+                <div class="value-prop">
+                    <h3>🌍 Global Coverage</h3>
+                    <p>Support for 12+ languages with automatic translation</p>
+                </div>
+                <div class="value-prop">
+                    <h3>🔒 Enterprise Security</h3>
+                    <p>SOC 2 compliant, GDPR ready, zero data retention policy</p>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <h3>1M+</h3>
+                    <p>Content pieces analyzed</p>
+                </div>
+                <div class="stat">
+                    <h3>500+</h3>
+                    <p>Enterprise customers</p>
+                </div>
+                <div class="stat">
+                    <h3>99.9%</h3>
+                    <p>Uptime SLA</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="pricing" class="section">
+            <h2>Choose Your Plan</h2>
+            <div class="pricing-container">
+                <div class="pricing-card free">
+                    <h3>Free Trial</h3>
+                    <div class="price">₹0<span>/month</span></div>
+                    <ul>
+                        <li>✅ 10 checks per day</li>
+                        <li>✅ Basic misinformation detection</li>
+                        <li>✅ Text & image analysis</li>
+                        <li>❌ API access</li>
+                        <li>❌ Bulk processing</li>
+                    </ul>
+                    <button class="pricing-btn" onclick="selectPlan('free')">Start Free</button>
+                </div>
+                <div class="pricing-card pro">
+                    <h3>Professional</h3>
+                    <div class="price">₹4,099<span>/month</span></div>
+                    <ul>
+                        <li>✅ 1,000 checks per day</li>
+                        <li>✅ Advanced 5-layer detection</li>
+                        <li>✅ Weekly misinformation insights</li>
+                        <li>✅ API access (1000 calls/month)</li>
+                        <li>✅ Bulk file processing</li>
+                        <li>✅ Priority support</li>
+                    </ul>
+                    <button class="pricing-btn" onclick="selectPlan('pro')">Choose Pro</button>
+                </div>
+                <div class="pricing-card enterprise">
+                    <h3>Enterprise</h3>
+                    <div class="price">Custom</div>
+                    <ul>
+                        <li>✅ Unlimited checks</li>
+                        <li>✅ Daily misinformation reports</li>
+                        <li>✅ White-label solution</li>
+                        <li>✅ Custom integrations</li>
+                        <li>✅ Dedicated support</li>
+                        <li>✅ SLA guarantees</li>
+                    </ul>
+                    <button class="pricing-btn" onclick="selectPlan('enterprise')">Contact Sales</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="enterprise" class="section">
+            <h2>Enterprise Solutions</h2>
+            <div class="enterprise-grid">
+                <div class="enterprise-card">
+                    <h3>🏢 News Organizations</h3>
+                    <p>Real-time fact-checking for newsrooms. Verify sources before publication.</p>
+                    <ul>
+                        <li>Journalist workflow integration</li>
+                        <li>Editorial dashboard</li>
+                        <li>Source credibility scoring</li>
+                    </ul>
+                </div>
+                <div class="enterprise-card">
+                    <h3>🏛️ Government Agencies</h3>
+                    <p>Combat disinformation campaigns and protect public information integrity.</p>
+                    <ul>
+                        <li>Threat intelligence feeds</li>
+                        <li>Campaign monitoring</li>
+                        <li>Public safety alerts</li>
+                    </ul>
+                </div>
+                <div class="enterprise-card">
+                    <h3>📱 Social Media Platforms</h3>
+                    <p>Automated content moderation and misinformation flagging at scale.</p>
+                    <ul>
+                        <li>Real-time API integration</li>
+                        <li>Bulk content analysis</li>
+                        <li>Custom detection rules</li>
+                    </ul>
+                </div>
+                <div class="enterprise-card">
+                    <h3>🎓 Educational Institutions</h3>
+                    <p>Teach media literacy and critical thinking with AI-powered tools.</p>
+                    <ul>
+                        <li>Student dashboard</li>
+                        <li>Learning analytics</li>
+                        <li>Curriculum integration</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="api" class="section">
+            <h2>Developer API</h2>
+            <div class="api-container">
+                <div class="api-info">
+                    <h3>Integrate Sudrashan into your applications</h3>
+                    <p>RESTful API with comprehensive misinformation detection capabilities</p>
+                    <div class="api-features">
+                        <div class="api-feature">
+                            <h4>🚀 Fast Response</h4>
+                            <p>Average 2-3 second processing time</p>
+                        </div>
+                        <div class="api-feature">
+                            <h4>📊 Detailed Analytics</h4>
+                            <p>Confidence scores, source attribution, threat levels</p>
+                        </div>
+                        <div class="api-feature">
+                            <h4>🔒 Enterprise Security</h4>
+                            <p>SOC 2 compliant, encrypted data transmission</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="api-demo">
+                    <h4>API Example</h4>
+                    <pre><code>curl -X POST https://api.sudrashan.com/v1/analyze \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "Your content to analyze",
+    "type": "text",
+    "language": "auto"
+  }'</code></pre>
+                    <button onclick="showApiDocs()">View Full Documentation</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="current-year"></span> Sudarsahan. All rights reserved.</p>
+    </footer>
+
+    <script src="api-keys.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
