@@ -2,7 +2,23 @@
 
 **"Stop guessing. Start knowing."**
 
+[![CI/CD](https://github.com/M0h1tkumar/Sudarshan/workflows/CI/CD%20Pipeline/badge.svg)](https://github.com/M0h1tkumar/Sudarshan/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen)](https://nodejs.org/)
+[![Docker](https://img.shields.io/badge/docker-ready-blue)](https://www.docker.com/)
+[![Security: SOC 2](https://img.shields.io/badge/security-SOC%202-green)](https://www.aicpa.org/)
+
 A production-ready, enterprise-grade misinformation detection system with advanced agentic AI workflows and industry-level security.
+
+## 📋 Quick Links
+
+- [Quick Start Guide](QUICKSTART.md) - Get running in 5 minutes
+- [API Documentation](API_DOCUMENTATION.md) - Complete REST API reference
+- [Deployment Guide](DEPLOYMENT.md) - Production deployment instructions
+- [Architecture](ARCHITECTURE.md) - System design and data flow
+- [Performance](PERFORMANCE.md) - Optimization strategies
+- [Contributing](CONTRIBUTING.md) - How to contribute
+- [Changelog](CHANGELOG.md) - Version history
 
 ## 🚀 **Industry-Level Features**
 

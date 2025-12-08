@@ -1,27 +1,55 @@
-# API Keys and Sensitive Data
-api-keys.js
-.env
-*.env
-
-# Node modules
+# Dependencies
 node_modules/
+package-lock.json
 
-# Build outputs
+# Environment
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Build
 dist/
 build/
 
-# IDE files
+# Database
+*.sql
+*.db
+backups/
+
+# SSL Certificates
+ssl/*.pem
+ssl/*.key
+ssl/*.crt
+
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# OS files
+# OS
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
-logs/
+# Docker
+docker-compose.override.yml
 
-# Database
-*.db
-*.sqlite
+# Secrets
+secrets/
+*.secret
+api-keys.js
+
+# Temporary
+tmp/
+temp/
